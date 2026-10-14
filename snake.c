@@ -5,15 +5,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define TIMEOUT 150
+#define TIMEOUT_MS  150
 #define GRID_WIDTH  20
 #define GRID_HEIGHT 20
 #define GRID_SIZE   (GRID_WIDTH * GRID_HEIGHT)
-#define CHAR_EMPTY '.'
-#define CHAR_HEAD  '0'
-#define CHAR_BODY  'o'
-#define CHAR_APPLE '@'
-#define ESC '\033'
+#define CHAR_EMPTY  '.'
+#define CHAR_HEAD   '0'
+#define CHAR_BODY   'o'
+#define CHAR_APPLE  '@'
 
 typedef struct {
 	int x;
@@ -66,7 +65,7 @@ int main(void)
 			if (!read_input())
 				break;
 
-			wtimeout(window, TIMEOUT);
+			wtimeout(window, TIMEOUT_MS);
 			init_state();
 			init_drawing();
 		}
@@ -85,7 +84,7 @@ void init_window(void)
 	cbreak();
 	noecho();
 	keypad(window, TRUE);
-	wtimeout(window, TIMEOUT);
+	wtimeout(window, TIMEOUT_MS);
 	set_escdelay(25);
 	curs_set(0);
 }
@@ -173,7 +172,7 @@ bool read_input(void)
 				dir.y = 0;
 			}
 			break;
-		case ESC:
+		case '\033':
 			return false;
 			break;
 	}
