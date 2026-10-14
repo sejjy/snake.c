@@ -21,7 +21,7 @@ typedef struct {
 
 WINDOW *window;
 int score;
-int best;
+int hiscore;
 int snake_size;
 int tail_idx;
 int head_idx;
@@ -49,7 +49,7 @@ void update_drawing(void);
 
 int main(void)
 {
-	best = 0;
+	hiscore = 0;
 
 	setlocale(LC_ALL, "");
 	srand((unsigned)time(NULL));
@@ -66,7 +66,7 @@ int main(void)
 		update_drawing();
 
 		if (snake_collided || finished) {
-			best = score > best ? score : best;
+			hiscore = score > hiscore ? score : hiscore;
 			wtimeout(window, -1);
 
 			if (!read_input())
@@ -80,7 +80,7 @@ int main(void)
 
 	endwin();
 
-	printf("score: %3d   best: %3d\n", score, best);
+	printf("score: %3d   hiscore: %3d\n", score, hiscore);
 
 	return 0;
 }
@@ -149,7 +149,7 @@ void init_drawing(void)
 
 void print_scores(void)
 {
-	mvwprintw(window, 0, 0, "score: %3d   best: %3d", score, best);
+	mvwprintw(window, 0, 0, "score: %3d   hiscore: %3d", score, hiscore);
 }
 
 void draw_char(int y, int x, char ch)
