@@ -149,17 +149,17 @@ void init_drawing(void)
 
 void print_scores(void)
 {
-	mvwprintw(window, 0, 1 * 2, "score: %3d   best: %3d", score, best);
+	mvwprintw(window, 0, 0, "score: %3d   best: %3d", score, best);
 }
 
 void draw_char(int y, int x, char ch)
 {
-	mvwaddch(window, 1 + y, (1 + x) * 2, ch);
+	mvwaddch(window, 1 + y, x * 2, ch);
 }
 
 void print_controls(void)
 {
-	mvwprintw(window, 1 + GRID_HEIGHT, 1 * 2, "move: w a s d   exit: esc");
+	mvwprintw(window, GRID_HEIGHT + 1, 0, "move: w a s d   exit: esc");
 }
 
 bool read_input(void)
