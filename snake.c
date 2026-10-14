@@ -13,6 +13,8 @@
 #define CHAR_HEAD   '0'
 #define CHAR_BODY   'o'
 #define CHAR_APPLE  '@'
+#define PADDING_X   1
+#define PADDING_Y   1
 
 typedef struct {
 	int x;
@@ -20,6 +22,8 @@ typedef struct {
 } vec2;
 
 WINDOW *window;
+int score;
+int highscore;
 int snake_size;
 int tail_idx;
 int head_idx;
@@ -38,6 +42,7 @@ void init_window(void);
 void init_state(void);
 void update_apple_pos(void);
 void init_drawing(void);
+void draw_char(int y, int x, char ch);
 void print_size(void);
 bool read_input(void);
 void update_state(void);
@@ -45,6 +50,8 @@ void update_drawing(void);
 
 int main(void)
 {
+	highscore = 0;
+
 	setlocale(LC_ALL, "");
 	srand((unsigned)time(NULL));
 
@@ -60,6 +67,7 @@ int main(void)
 		update_drawing();
 
 		if (snake_collided || finished) {
+			highscore = score > highscore ? score : highscore;
 			wtimeout(window, -1);
 
 			if (!read_input())
@@ -73,7 +81,7 @@ int main(void)
 
 	endwin();
 
-	printf("size: %3d / %d\n", snake_size, GRID_SIZE);
+	printf("score: %3d   highscore: %3d\n", score, highscore);
 
 	return 0;
 }
@@ -93,6 +101,7 @@ void init_state(void)
 {
 	int x, y;
 
+	score = 0;
 	snake_size = 2;
 	tail_idx = 0;
 	head_idx = 1;
@@ -129,18 +138,24 @@ void init_drawing(void)
 
 	for (y = 0; y < GRID_HEIGHT; y++)
 		for (x = 0; x < GRID_WIDTH; x++)
-			mvwaddch(window, y, x * 2, CHAR_EMPTY);
+			draw_char(y, x, CHAR_EMPTY);
 
-	mvwaddch(window, snake[tail_idx].y, snake[tail_idx].x * 2, CHAR_BODY);
-	mvwaddch(window, snake[head_idx].y, snake[head_idx].x * 2, CHAR_HEAD);
-	mvwaddch(window, apple.y, apple.x * 2, CHAR_APPLE);
+	draw_char(snake[tail_idx].y, snake[tail_idx].x, CHAR_BODY);
+	draw_char(snake[head_idx].y, snake[head_idx].x, CHAR_HEAD);
+	draw_char(apple.y, apple.x, CHAR_APPLE);
 
 	print_size();
 }
 
+void draw_char(int y, int x, char ch)
+{
+	mvwaddch(window, PADDING_Y + y, (PADDING_X + x) * 2, ch);
+}
+
 void print_size(void)
 {
-	mvwprintw(window, GRID_HEIGHT, 0, "size: %3d / %d", snake_size, GRID_SIZE);
+	mvwprintw(window, PADDING_Y + GRID_HEIGHT, PADDING_X * 2,
+	          "score: %3d   highscore: %3d", score, highscore);
 }
 
 bool read_input(void)
@@ -212,6 +227,7 @@ void update_state(void)
 	head_idx = (head_idx + 1) % GRID_SIZE;
 
 	if (apple_consumed) {
+		score += 1;
 		snake_size += 1;
 		finished = snake_size == GRID_SIZE;
 
@@ -225,14 +241,14 @@ void update_state(void)
 void update_drawing(void)
 {
 	if (!apple_consumed)
-		mvwaddch(window, prev_tail_pos.y, prev_tail_pos.x * 2, CHAR_EMPTY);
+		draw_char(prev_tail_pos.y, prev_tail_pos.x, CHAR_EMPTY);
 
-	mvwaddch(window, prev_head_pos.y, prev_head_pos.x * 2, CHAR_BODY);
-	mvwaddch(window, next_head_pos.y, next_head_pos.x * 2, CHAR_HEAD);
+	draw_char(prev_head_pos.y, prev_head_pos.x, CHAR_BODY);
+	draw_char(next_head_pos.y, next_head_pos.x, CHAR_HEAD);
 
 	if (apple_consumed) {
 		if (!finished)
-			mvwaddch(window, apple.y, apple.x * 2, CHAR_APPLE);
+			draw_char(apple.y, apple.x, CHAR_APPLE);
 		print_size();
 	}
 }
