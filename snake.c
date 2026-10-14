@@ -13,8 +13,6 @@
 #define CHAR_HEAD   '0'
 #define CHAR_BODY   'o'
 #define CHAR_APPLE  '@'
-#define PADDING_X   1
-#define PADDING_Y   1
 
 typedef struct {
 	int x;
@@ -23,7 +21,7 @@ typedef struct {
 
 WINDOW *window;
 int score;
-int highscore;
+int best;
 int snake_size;
 int tail_idx;
 int head_idx;
@@ -42,15 +40,16 @@ void init_window(void);
 void init_state(void);
 void update_apple_pos(void);
 void init_drawing(void);
+void print_scores(void);
 void draw_char(int y, int x, char ch);
-void print_size(void);
+void print_controls(void);
 bool read_input(void);
 void update_state(void);
 void update_drawing(void);
 
 int main(void)
 {
-	highscore = 0;
+	best = 0;
 
 	setlocale(LC_ALL, "");
 	srand((unsigned)time(NULL));
@@ -67,7 +66,7 @@ int main(void)
 		update_drawing();
 
 		if (snake_collided || finished) {
-			highscore = score > highscore ? score : highscore;
+			best = score > best ? score : best;
 			wtimeout(window, -1);
 
 			if (!read_input())
@@ -81,7 +80,7 @@ int main(void)
 
 	endwin();
 
-	printf("score: %3d   highscore: %3d\n", score, highscore);
+	printf("score: %3d   best: %3d\n", score, best);
 
 	return 0;
 }
@@ -135,6 +134,7 @@ void init_drawing(void)
 	int x, y;
 
 	werase(window);
+	print_scores();
 
 	for (y = 0; y < GRID_HEIGHT; y++)
 		for (x = 0; x < GRID_WIDTH; x++)
@@ -144,18 +144,22 @@ void init_drawing(void)
 	draw_char(snake[head_idx].y, snake[head_idx].x, CHAR_HEAD);
 	draw_char(apple.y, apple.x, CHAR_APPLE);
 
-	print_size();
+	print_controls();
+}
+
+void print_scores(void)
+{
+	mvwprintw(window, 0, 1 * 2, "score: %3d   best: %3d", score, best);
 }
 
 void draw_char(int y, int x, char ch)
 {
-	mvwaddch(window, PADDING_Y + y, (PADDING_X + x) * 2, ch);
+	mvwaddch(window, 1 + y, (1 + x) * 2, ch);
 }
 
-void print_size(void)
+void print_controls(void)
 {
-	mvwprintw(window, PADDING_Y + GRID_HEIGHT, PADDING_X * 2,
-	          "score: %3d   highscore: %3d", score, highscore);
+	mvwprintw(window, 1 + GRID_HEIGHT, 1 * 2, "move: w a s d   exit: esc");
 }
 
 bool read_input(void)
@@ -249,6 +253,6 @@ void update_drawing(void)
 	if (apple_consumed) {
 		if (!finished)
 			draw_char(apple.y, apple.x, CHAR_APPLE);
-		print_size();
+		print_scores();
 	}
 }
