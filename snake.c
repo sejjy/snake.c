@@ -126,6 +126,8 @@ void init_drawing(void)
 {
 	int x, y;
 
+	werase(window);
+
 	for (y = 0; y < GRID_HEIGHT; y++)
 		for (x = 0; x < GRID_WIDTH; x++)
 			mvwaddch(window, y, x * 2, CHAR_EMPTY);
