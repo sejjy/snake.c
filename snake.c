@@ -41,6 +41,7 @@ void init_state(void);
 void update_apple_pos(void);
 void init_drawing(void);
 void print_scores(void);
+void draw_walls(void);
 void draw_char(int y, int x, char ch);
 void print_controls(void);
 bool read_input(void);
@@ -135,6 +136,7 @@ void init_drawing(void)
 
 	werase(window);
 	print_scores();
+	draw_walls();
 
 	for (y = 0; y < GRID_HEIGHT; y++)
 		for (x = 0; x < GRID_WIDTH; x++)
@@ -149,17 +151,39 @@ void init_drawing(void)
 
 void print_scores(void)
 {
-	mvwprintw(window, 0, 0, "score: %3d   hiscore: %3d", score, hiscore);
+	mvwprintw(window, 0, 2, "score: %3d   hiscore: %3d", score, hiscore);
+}
+
+void draw_walls(void)
+{
+	int x, y;
+	int w = GRID_WIDTH * 2 + 2;
+	int h = GRID_HEIGHT + 2;
+
+	mvwprintw(window, 1, 0, "┌");
+	for (x = 1; x < w; x++)
+		mvwprintw(window, 1, x, "─");
+	mvwprintw(window, 1, w, "┐");
+
+	for (y = 2; y < h; y++) {
+		mvwprintw(window, y, 0, "│");
+		mvwprintw(window, y, w, "│");
+	}
+
+	mvwprintw(window, h, 0, "└");
+	for (x = 1; x < w; x++)
+		mvwprintw(window, h, x, "─");
+	mvwprintw(window, h, w, "┘");
 }
 
 void draw_char(int y, int x, char ch)
 {
-	mvwaddch(window, 1 + y, x * 2, ch);
+	mvwaddch(window, 2 + y, (1 + x) * 2, ch);
 }
 
 void print_controls(void)
 {
-	mvwprintw(window, GRID_HEIGHT + 1, 0, "move: w a s d   exit: esc");
+	mvwprintw(window, 3 + GRID_HEIGHT, 2, "move: w a s d   exit: esc");
 }
 
 bool read_input(void)
